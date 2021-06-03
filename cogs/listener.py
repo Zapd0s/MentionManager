@@ -11,6 +11,9 @@ class Manager(commands.Cog):
   
   @commands.Cog.listener('on_message')
   async def log_pings(self, message:discord.Message):
+    """
+    Logs mentions into the mentioned user's database
+    """
     if not message.mentions:
       return
     if not message.guild:
