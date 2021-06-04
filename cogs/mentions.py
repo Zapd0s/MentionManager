@@ -5,6 +5,17 @@ import asqlite
 import humanize
 import asyncio
 import datetime
+from paginator import MentionPages
+from discord.ext import menus
+
+
+class EmbedField:
+  def __init__(self, name, value):
+    self.name = name
+    self.value = value
+
+
+
 
 
 class Mentions(commands.Cog):
@@ -28,16 +39,22 @@ class Mentions(commands.Cog):
     conn = await asqlite.connect(f'data/{ctx.author.id}.sqlite')
     if ctx.guild:
       len_res = len(await conn.fetchall("SELECT * FROM mentions WHERE guild_id = ?", (ctx.guild.id,)))
-      res = await conn.fetchmany("SELECT * FROM mentions WHERE guild_id = ?", (ctx.guild.id,), size=10)
+      res = await conn.fetchall("SELECT * FROM mentions WHERE guild_id = ?", (ctx.guild.id,))
     else:
       len_res = len(await conn.fetchall("SELECT * FROM mentions"))
-      res = await conn.fetchmany("SELECT * FROM mentions", size=25)
-    embed = discord.Embed(title="Recent Mentions", color=self.bot.color)
+      res = await conn.fetchall("SELECT * FROM mentions")
+    
+    await conn.execute("DELETE FROM mentions WHERE guild_id = ?", (ctx.guild.id,))
+    await conn.commit()
+    await conn.close()
     if len_res == 0:
+      embed = discord.Embed(title="Recent Mentions", color=self.bot.color)
       embed.description = "You have no mentions"
       await ctx.send(embed=embed)
-      await conn.close()
       return
+    
+    fields_list = []
+
     for row in res:
       ghost = False
       channel = ctx.guild.get_channel(row[1])
@@ -59,39 +76,16 @@ class Mentions(commands.Cog):
       except UnboundLocalError:
         link = f"[Jump!](https://discord.com/channels/{row[0]}/{row[1]}/{row[2]})"
       created_time = datetime.datetime.fromtimestamp(row[5])
-      embed.add_field(name = name, value = f"**Content:** {row[4]}\n**Channel:** <#{row[1]}>\n**Time:** {humanize.precisedelta(datetime.datetime.now() - created_time)} ago\n {link}")
-    await conn.close()
-    embed.set_footer(text = f"Showing {len(embed.fields)} of {len_res} mentions • React here to clear the above mentions")
-    message = await ctx.send(embed = embed)
-    await message.add_reaction("⏹️")
-    def check(reaction, user):
-      if user.id == ctx.author.id:
-        if reaction.message.id == message.id:
-          if reaction.emoji == "⏹️":
-            return True
-          else:
-            return False
-        else:
-          return False
-      else:
-        return False
-    try:
-      await self.bot.wait_for('reaction_add', check=check, timeout=60)
-    except asyncio.TimeoutError:
-      return
-    else:
-      conn = await asqlite.connect(f"data/{ctx.author.id}.sqlite")
-      await conn.execute("DELETE FROM mentions WHERE guild_id = ? LIMIT ?", (ctx.guild.id, len(embed.fields)))
-      await conn.commit()
-      if ctx.guild:
-        len_res = len(await conn.fetchall("SELECT * FROM mentions WHERE guild_id = ?", (ctx.guild.id,)))
-      else:
-        len_res = len(await conn.fetchall("SELECT * FROM mentions"))
-      await ctx.reply(f"Cleared {len(embed.fields)} mentions. {len_res} remaining", delete_after = 5)
-      await conn.close()
+      field = EmbedField(name = name, value = f"**Content:** {row[4]}\n**Channel:** <#{row[1]}>\n**Time:** {humanize.precisedelta(datetime.datetime.now() - created_time)} ago\n {link}")
+      fields_list.append(field)
+    menu = menus.MenuPages(MentionPages(fields_list, ctx, per_page=3))
+    await menu.start(ctx)
 
     
-  @mentions.error
+
+      
+    
+  # @mentions.error
   async def mentions_error(self, ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
       msg = await ctx.send("You don't seem to have an account! Do you want to create one?")

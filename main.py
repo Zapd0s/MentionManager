@@ -5,12 +5,14 @@ import traceback
 import datetime
 
 
+
 inital_extensions = (
   "cogs.configurations",
   "cogs.listener",
   "cogs.mentions",
   "cogs.meta",
   "jishaku",
+  "cogs.error_handler"
   # "cogs.help" not finished yet!
 )
 
@@ -23,7 +25,8 @@ class MentionManager(commands.Bot):
       guilds = True,
       members = True,
       messages = True,
-      reactions = True
+      reactions = True,
+      presences = True
     )
     
     super().__init__(
@@ -45,6 +48,7 @@ class MentionManager(commands.Bot):
   async def on_ready(self):
     self.uptime = datetime.datetime.now()
     print("Bot ready.")
+
 
   def run(self):
     token = os.environ["TOKEN"]

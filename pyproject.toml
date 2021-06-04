@@ -9,6 +9,7 @@ python = "^3.8"
 humanize = "^3.7.0"
 jishaku = "^1.20.0"
 discord = "^1.0.1"
+async-property = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 
