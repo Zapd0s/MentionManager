@@ -76,7 +76,10 @@ class Mentions(commands.Cog):
       except UnboundLocalError:
         link = f"[Jump!](https://discord.com/channels/{row[0]}/{row[1]}/{row[2]})"
       created_time = datetime.datetime.fromtimestamp(row[5])
-      field = EmbedField(name = name, value = f"**Content:** {row[4]}\n**Channel:** <#{row[1]}>\n**Time:** {humanize.precisedelta(datetime.datetime.now() - created_time)} ago\n {link}")
+      content = row[4]
+      if len(content) > 800:
+        content = "Message too long"
+      field = EmbedField(name = name, value = f"**Content:** {content}\n**Channel:** <#{row[1]}>\n**Time:** {humanize.precisedelta(datetime.datetime.now() - created_time)} ago\n {link}")
       fields_list.append(field)
     menu = menus.MenuPages(MentionPages(fields_list, ctx, per_page=3))
     await menu.start(ctx)

@@ -88,6 +88,17 @@ version = "1.0.1"
 
 [[package]]
 category = "main"
+description = "An extension module to make reaction based menus with discord.py"
+name = "discord-ext-menus"
+optional = false
+python-versions = ">=3.5.3"
+version = "1.1"
+
+[package.dependencies]
+"discord.py" = ">=1.2.5"
+
+[[package]]
+category = "main"
 description = "A Python wrapper for the Discord API"
 name = "discord.py"
 optional = false
@@ -205,7 +216,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "ce68345308ce8f275b5a3e5e45cd99d3578a40aeebc0f98a8842b4991e068f03"
+content-hash = "5ba40b5ef69cc3005f562429b6e317201608984dac71e906934b94fd0e4faab0"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -275,6 +286,10 @@ chardet = [
 discord = [
     {file = "discord-1.0.1-py3-none-any.whl", hash = "sha256:9d4debb4a37845543bd4b92cb195bc53a302797333e768e70344222857ff1559"},
     {file = "discord-1.0.1.tar.gz", hash = "sha256:ff6653655e342e7721dfb3f10421345fd852c2a33f2cca912b1c39b3778a9429"},
+]
+discord-ext-menus = [
+    {file = "discord-ext-menus-1.1.tar.gz", hash = "sha256:96104fb63aae63846b7f722ca29da31f143e273d1c5745ef7427540814a31da8"},
+    {file = "discord_ext_menus-1.1-py3-none-any.whl", hash = "sha256:d3c9fc8cacf533ed78fc177482889ae72236f09968184ac90bdfa6a8555b5108"},
 ]
 "discord.py" = [
     {file = "discord.py-1.7.2-py3-none-any.whl", hash = "sha256:f179db299c949a8cf0a12c1b1b94d0da9a18e088857154d93ae5ab1d807ec61d"},
